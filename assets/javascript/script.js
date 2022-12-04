@@ -8,120 +8,133 @@ var saveBtn = $('.saveBtn');
 var eventText = $('.description');
 
 // Time sync
+var currentStorage = [];
 var currentDay;
 var currentTime;
 var timeList = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 var timeText = $(".description");
 
-function setLocalStorage(elementToAdd) {
+// Save to localStorage.
+function setLocalStorage(addedEvent) {
   var currentStorage = getLocalStorage();
-  // currentStorage.push(elementToAdd);
-  console.log(currentStorage)
+  currentStorage.push(addedEvent);
+  console.log('saving storage: ' + currentStorage);
   localStorage.setItem('event', JSON.stringify(currentStorage));
 }
 
-// Work on localStorage!
+
+// Read from localStorage!
 function getLocalStorage() {
+  var currentStorage = localStorage.getItem('event');
+  if (currentStorage) {
+    currentStorage = JSON.parse(currentStorage);
+  } else {
+    currentStorage = [];
+  }
+  console.log('localstorage: ' + currentStorage)
+  return currentStorage;
+}
+
+// Display saved info on page
+function displayLocalStorage() {
+  var currentStorage = getLocalStorage('event');
+  for (var i = 0; i < currentStorage.length; i++) {
+    var textToDisplay = currentStorage[i].text;
+    eventText.value = textToDisplay;
+  }}
 
   // JSON.parse(localStorage.getItem('event'[0])) || [];
   // for (let i = 0; i < timeList.length; i++) {
-    //   timeText.each(function (i, a) {
-    //     $(a).val(localStorage.getItem('text'[i]))
-    //   });
-    //   console.log("GetLocal" + timeText);
-    // }
-    $('timeText').each(function(i) {
-      eventText= (localStorage.getItem[i].value);
-      console.log("get " + eventText);
+  //   timeText.each(function (i, a) {
+  //     $(a).val(localStorage.getItem('text'[i]))
+  //   });
+  //   console.log("GetLocal" + timeText);
+  // }
+  //   $('timeText').each(function(i) {
+  //     eventText= (localStorage.getItem[i].value);
+  //     console.log("get " + eventText);
+  //   })
+  // }
+  // }
+
+  // Events persist on refresh
+
+
+  // First, get time from DayJS
+  function currentDayJs() {
+    var currentDay = dayjs().format('dddd MMM D, YYYY');
+    var currentHour = dayjs().format('hh:mm a');
+    $('#currentDay').text(currentDay);
+    console.log(currentDay, currentHour);
+  }
+
+  // When I view the timeblocks for the day, each timeblock is color coded to indicate whether it is in the past, present, or future
+  function setColor() {
+    console.log("Setting color");
+    // First, ref current time.
+    timeText.each(function (i) {
+      currentTime = parseInt(dayjs().format('H'));
+      // Get number from ID field
+      blockTime = $(this).attr('id').split('-')[1];
+      // Next, compare each block to current time.
+      console.log(i, currentTime);
+      console.log(i, blockTime)
+      // If it's later:
+      if (currentTime < blockTime) {
+        $(this).removeClass('past present');
+        $(this).addClass('future');
+        // If it's the same hour:
+      } else if (currentTime == blockTime) {
+        $(this).removeClass('past future');
+        $(this).addClass('present');
+        // If it's earlier:
+      } else if (currentTime > blockTime) {
+        $(this).removeClass('present future');
+        $(this).addClass('past');
+        // If it didn't work:
+      } else {
+        console.log('You have become unstuck in time.');
+      }
+      setInterval(setColor, 60000);
+      // getLocalStorage();
     })
   }
-// }
 
-// Events persist on refresh
+  // Page load functions
+  // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
+  // the code isn't run until the browser has finished rendering all the elements
+  // in the html.
+  $(function () {
+    currentDayJs();
+    setColor();
+    displayLocalStorage();
+    // Make sure time stays up to date
+    setInterval(currentDayJs, 60000);
+    console.log(currentDayJs);
+  });
 
+  // TODO: Add a listener for click events on the save button. This code should
+  // use the id in the containing time-block as a key to save the user input in
+  // local storage. HINT: What does `this` reference in the click listener
+  // function? How can DOM traversal be used to get the "hour-x" id of the
+  // time-block containing the button that was clicked? How might the id be
+  // useful when saving the description in local storage?
+  //
 
-// First, get time from DayJS
-function currentDayJs() {
-  var currentDay = dayjs().format('dddd MMM D, YYYY');
-  var currentHour = dayjs().format('hh:mm a');
-  $('#currentDay').text(currentDay);
-  console.log(currentDay, currentHour);
-}
-
-// When I view the timeblocks for the day, each timeblock is color coded to indicate whether it is in the past, present, or future
-function setColor() {
-  console.log("Setting color");
-  // First, ref current time.
-  timeText.each(function (i) {
-    currentTime = parseInt(dayjs().format('H'));
-    // Get number from ID field
-    blockTime = $(this).attr('id').split('-')[1];
-    // Next, compare each block to current time.
-    console.log(i, currentTime);
-    console.log(i, blockTime)
-    // If it's later:
-    if (currentTime < blockTime) {
-      $(this).removeClass('past present');
-      $(this).addClass('future');
-      // If it's the same hour:
-    } else if (currentTime == blockTime) {
-      $(this).removeClass('past future');
-      $(this).addClass('present');
-      // If it's earlier:
-    } else if (currentTime > blockTime) {
-      $(this).removeClass('present future');
-      $(this).addClass('past');
-      // If it didn't work:
-    } else {
-      console.log('You have become unstuck in time.');
-    }
-    // getLocalStorage();
+  saveBtn.each(function (i) {
+    $(this).click(function (event) {
+      event.preventDefault();
+      console.log("here", timeText[i].getAttribute('id').split('-')[1])
+      console.log("clicked")
+      console.log(eventText[i].value);
+      var addedEvent = {
+        text: eventText[i].value,
+        time: timeText[i].getAttribute('id').split('-')[1]
+      };
+      setLocalStorage(addedEvent)
+      console.log('Saved ' + addedEvent);
+    })
   })
-}
-
-// function renderBlocks() {
-//   for (let i = 0; i < timeList.length; i++) {
-
-//   }
-// }
-// Page load functions
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-$(function () {
-  currentDayJs();
-  setColor();
-
-
-  // Make sure time stays up to date
-  setInterval(currentDayJs, 60000);
-  console.log(currentDayJs)
-});
-
-// TODO: Add a listener for click events on the save button. This code should
-// use the id in the containing time-block as a key to save the user input in
-// local storage. HINT: What does `this` reference in the click listener
-// function? How can DOM traversal be used to get the "hour-x" id of the
-// time-block containing the button that was clicked? How might the id be
-// useful when saving the description in local storage?
-//
-
-saveBtn.each(function (i) {
-
-
-  $(this).click(function (event) {
-    // event.preventDefault();
-    console.log("here", timeText[i].getAttribute('id').split('-')[1])
-    console.log("clicked")
-    console.log(eventText.value);
-    var addedEvent = {
-      text: eventText[i].value,
-      time: timeText[i].getAttribute('id').split('-')[1]
-    };
-    setLocalStorage(addedEvent)
-    console.log('Saved');
-  })
-})
 
   // TODO: Add code to apply the past, present, or future class to each time
   // block by comparing the id to the current hour. HINTS: How can the id
