@@ -5,7 +5,7 @@
 // When I click the save button for that timeblock, the text for the event is saved into localstorage
 // Storing vars
 var saveBtn = $('.saveBtn');
-var eventText = $('.description');
+// var eventText = $('.description');
 
 // Time sync
 var currentStorage = [];
@@ -15,33 +15,34 @@ var timeList = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 var timeText = $(".description");
 
 // Save to localStorage.
-function setLocalStorage(addedEvent) {
-  var currentStorage = getLocalStorage();
-  currentStorage.push(addedEvent);
-  console.log('saving storage: ' + currentStorage);
-  localStorage.setItem('event', JSON.stringify(currentStorage));
-}
+// function setLocalStorage(addedEvent) {
+//   var currentStorage = getLocalStorage();
+//   currentStorage.push(addedEvent);
+//   console.log('saving storage: ' + currentStorage);
+//   localStorage.setItem('event', JSON.stringify(currentStorage));
+// }
 
 
 // Read from localStorage!
-function getLocalStorage() {
-  var currentStorage = localStorage.getItem('event');
-  if (currentStorage) {
-    currentStorage = JSON.parse(currentStorage);
-  } else {
-    currentStorage = [];
-  }
-  console.log('localstorage: ' + currentStorage)
-  return currentStorage;
-}
+// function getLocalStorage() {
+//   var currentStorage = localStorage.getItem('event');
+//   if (currentStorage) {
+//     currentStorage = JSON.parse(currentStorage);
+//   } else {
+//     currentStorage = [];
+//   }
+//   console.log('localstorage: ' + currentStorage)
+//   return currentStorage;
+// }
 
 // Display saved info on page
-function displayLocalStorage() {
-  var currentStorage = getLocalStorage('event');
-  for (var i = 0; i < currentStorage.length; i++) {
-    var textToDisplay = currentStorage[i].text;
-    eventText.value = textToDisplay;
-  }}
+// function displayLocalStorage() {
+//   var currentStorage = getLocalStorage('event');
+//   for (var i = 0; i < currentStorage.length; i++) {
+//     var textToDisplay = currentStorage[i].text;
+//     timeText.value = textToDisplay;
+//   }}
+
 
   // JSON.parse(localStorage.getItem('event'[0])) || [];
   // for (let i = 0; i < timeList.length; i++) {
@@ -107,10 +108,13 @@ function displayLocalStorage() {
   $(function () {
     currentDayJs();
     setColor();
-    displayLocalStorage();
     // Make sure time stays up to date
     setInterval(currentDayJs, 60000);
     console.log(currentDayJs);
+    timeText.each(function(i) {
+      console.log(timeText[i]);
+      timeText[i].value= localStorage.getItem(`btn-${$(this).attr('data-hour')}`);
+    })
   });
 
   // TODO: Add a listener for click events on the save button. This code should
@@ -123,16 +127,12 @@ function displayLocalStorage() {
 
   saveBtn.each(function (i) {
     $(this).click(function (event) {
-      event.preventDefault();
+      // event.preventDefault();
       console.log("here", timeText[i].getAttribute('id').split('-')[1])
       console.log("clicked")
-      console.log(eventText[i].value);
-      var addedEvent = {
-        text: eventText[i].value,
-        time: timeText[i].getAttribute('id').split('-')[1]
-      };
-      setLocalStorage(addedEvent)
-      console.log('Saved ' + addedEvent);
+      console.log(timeText[i].value);
+      localStorage.setItem($(this).attr('id'),timeText[i].value);
+      console.log('Saved', timeText.val);
     })
   })
 
