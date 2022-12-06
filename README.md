@@ -10,7 +10,11 @@ This webpage hosts a scheduling program to allow the user to keep track of the d
 
 The following is a screen shot of how past events appear on the website:
 
-![website demo](./assets/images/screen-shot.jpg)
+![past demo](./assets/images/screen-shot.jpg)
+
+The following is a screen shot of how current and future events appear:
+
+![present and future demo](./assets/images/screen-shot-2.jpg)
 
 
 ## Installation
